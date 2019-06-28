@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+. $(dirname $(readlink -f $0))/functions.sh
+
+FAIL_ON_ERROR
+
+#This holds the details for the scripts here
+SUDO_CMD=sudo
+HTTPD_DIR=/app/escreening/httpd/latest
+APACHE_CTL=/app/escreening/httpd/latest/bin/apachectl
+WEB_PORT_TO_FORWARD_TO_80=8000
+WEB_PORT_TO_FORWARD_TO_443=8443
+WEB_PORT_TO_FORWARD_TO_444=8444
+TOMCAT_DIR=/app/escreening/tomcat/latest
+TOMCAT_USER=www-data
+SCRIPTS_DIR=/app/escreening/scripts
+APP_WAR=/tmp/escreening.war
+APP_WAR_TOMCAT=/app/escreening/war/escreening.war
+#was $TOMCAT_DIR/webapps/
+APP_PROPERTIES_ORIGINAL=/app/escreening/properties/escreening-war/escreening.properties.org
+APP_PROPERTIES=/app/escreening/properties/escreening-war/escreening.properties
+JAVA_LOCATION=/app/escreening/java/latest
+SSH_PUSH_DEST=10.247.133.12
+SERVER_TYPE="DEV" #PREPROD, DEV, SQA
+THISCMD="$0"
+THISARGS="$@"
+THISDIR="${PWD##*/}"
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+
+#SCRIPTPATH="$SCRIPTS_DIR"
+#if [ "$SCRIPTPATH" != "/tmp" ] && [ "$SCRIPTPATH" != "$SCRIPTS_DIR" ]; then
+    #SCRIPTPATH = "$SCRIPTS_DIR"
+#fi
+setJavaHome
+#echo THISCMD="$THISCMD"
+#echo THISARGS="$THISARGS"
+#echo THISDIR="$THISDIR"
+#echo SCRIPTPATH="$SCRIPTPATH"
+#echo SERVER_TYPE="$SERVER_TYPE"
+#echo JAVA_HOME="$JAVA_HOME"
+#echo "$@"
