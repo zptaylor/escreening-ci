@@ -146,8 +146,13 @@ copyProperties()
 }
 copyWAR()
 {
-    echo Copying WAR file $APP_WAR to $APP_WAR_TOMCAT
-    cp -p $APP_WAR $APP_WAR_TOMCAT
+    if [ -f "$APP_WAR" ]; then
+        echo Copying WAR file $APP_WAR to $APP_WAR_TOMCAT    
+        cp -p $APP_WAR $APP_WAR_TOMCAT
+    else
+        echo WAR file could not be found at $APP_WAR
+	exit 1
+    fi
 }
 deploy()
 {
