@@ -105,7 +105,7 @@ tomcatDebug()
     copyProperties
     copyWAR
     $TOMCAT_DIR/bin/catalina.sh jpda start
-    showlog
+    tomcatShowlog
 }
 tomcatStartup()
 {
@@ -169,11 +169,11 @@ deploy()
     copyWAR
     tomcatStartup
     apacheStart || true
-    showlog
+    tomcatShowlog
     
     exit 0
 }
-showlog()
+tomcatShowlog()
 {
     if [ "$USER" != "$TOMCAT_USER" ]
     then
@@ -198,6 +198,32 @@ showlog()
     fi
     
     tail $TAIL_OPTS $TOMCAT_DIR/logs/catalina.out
+}
+apacheShowlog()
+{
+    if [ "$USER" != "$TOMCAT_USER" ]
+    then
+        rerunAs "$TOMCAT_USER"
+        echo exiting
+        exit 0;
+    fi
+    echo Running as "$USER"
+    TAIL_OPTS=-f
+    local arg1=$THISARGS
+    if [ -n "${arg1-}" ]
+    then
+        #       echo 'not empty'
+        #       echo "Argument supplied: $arg1"
+        TAIL_OPTS=$arg1
+
+    #elif [ "${arg1+defined}" = defined ]
+    #then
+    #    echo 'empty but defined'
+    #else
+    #    echo 'unset'
+    fi
+
+    find "$HTTPD_DIR"/logs/ -type f \( -name "*log" \) -exec tail "$TAIL_OPTS" {} +
 }
 pushToOtherServer()
 {
@@ -224,7 +250,7 @@ hotDeploy()
     fi
     copyProperties
     copyWAR
-    showlog
+    tomcatShowlog
 }
 wipeIptables()
 {
@@ -243,6 +269,16 @@ wipeIptables()
     iptables -F
     iptables -X
     echo "All wiped"
+}
+showIptables()
+{
+    if [ "$USER" != "root" ]
+    then
+        rerunAs "root"
+        echo exiting
+        exit 0;
+    fi
+    sudo  iptables -t nat -L -n
 }
 initIptables()
 {
