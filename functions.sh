@@ -89,7 +89,7 @@ apacheShutdown()
         exit 0;
     fi
     
-    echo "Stop Apache HTTPD with $APACHE_CTL start"
+    echo "Stop Apache HTTPD with $APACHE_CTL stop"
     $APACHE_CTL stop
 }
 tomcatDebug()

@@ -7,7 +7,7 @@ FAIL_ON_ERROR
 SUDO_CMD=sudo
 HTTPD_DIR=/app/escreening/httpd/latest
 APACHE_CTL=/app/escreening/httpd/latest/bin/apachectl
-WEB_PORT_TO_FORWARD_TO_80=8080
+WEB_PORT_TO_FORWARD_TO_80=8000
 #8000 is Apache HTTP port
 WEB_PORT_TO_FORWARD_TO_443=8443
 #8443 is Apache HTTPS port
@@ -15,7 +15,8 @@ WEB_PORT_TO_FORWARD_TO_444=8444
 TOMCAT_DIR=/app/escreening/tomcat/latest
 TOMCAT_USER=www-data
 SCRIPTS_DIR=/app/escreening/scripts
-APP_WAR=/home/ec2-user/escreening.war
+APP_WAR=/app/escreening/escreen-3.0-test/escreening/target/escreening.war
+#APP_WAR=/home/ec2-user/escreening.war
 APP_WAR_TOMCAT=/app/escreening/war/escreening.war
 #was $TOMCAT_DIR/webapps/
 APP_PROPERTIES_ORIGINAL=/app/escreening/properties/escreening-war/escreening.properties.org
