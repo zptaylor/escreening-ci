@@ -67,6 +67,19 @@ sudoRun()
     echo sudoRunning $SUDO_CMD $@
     $SUDO_CMD $@
 }
+apacheRestart()
+{
+    if [ "$USER" != "$TOMCAT_USER" ]
+    then
+        rerunAs "$TOMCAT_USER"
+        echo exiting
+        exit 0;
+    fi
+
+    apacheShutdown
+    apacheStart
+    apacheShowlog
+}
 apacheStart()
 {
     if [ "$USER" != "$TOMCAT_USER" ]
@@ -91,6 +104,7 @@ apacheShutdown()
     
     echo "Stop Apache HTTPD with $APACHE_CTL stop"
     $APACHE_CTL stop
+    pkill -u $TOMCAT_USER httpd || true
 }
 tomcatDebug()
 {
