@@ -160,7 +160,7 @@ copyProperties()
 }
 copyWAR()
 {
-    if [ -f "$APP_WAR" ]; then
+    if [ -r "$APP_WAR" ]; then
         echo Copying WAR file $APP_WAR to $APP_WAR_TOMCAT    
         cp -p $APP_WAR $APP_WAR_TOMCAT
     else

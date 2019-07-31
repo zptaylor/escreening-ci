@@ -15,13 +15,14 @@ WEB_PORT_TO_FORWARD_TO_444=8444
 TOMCAT_DIR=/app/escreening/tomcat/latest
 TOMCAT_USER=www-data
 SCRIPTS_DIR=/app/escreening/scripts
-APP_WAR=/home/ec2-user/escreening.war
+#APP_WAR=/home/ec2-user/escreening.war
+APP_WAR=/app/escreening/git-repo/eScreening/escreening/target/escreening.war
 APP_WAR_TOMCAT=/app/escreening/war/escreening.war
 #was $TOMCAT_DIR/webapps/
 APP_PROPERTIES_ORIGINAL=/app/escreening/properties/escreening-war/escreening.properties.org
 APP_PROPERTIES=/app/escreening/properties/escreening-war/escreening.properties
 JAVA_LOCATION=/app/escreening/java/latest
-SSH_PUSH_DEST=10.247.133.12
+SSH_PUSH_DEST=10.247.133.7
 SERVER_TYPE="DEV" #PREPROD, DEV, SQA
 THISCMD="$0"
 THISARGS="$@"
