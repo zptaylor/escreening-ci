@@ -35,7 +35,7 @@ checkUserVariable()
 
 rerunAs()
 {
-    echo rerunAs "$@"
+    echo rerunAs "$@" from "$USER"
     sudoRun -u "$@" "$THISCMD" "$THISARGS"
 }
 
@@ -162,7 +162,7 @@ copyWAR()
 {
     if [ -f "$APP_WAR" ]; then
         echo Copying WAR file $APP_WAR to $APP_WAR_TOMCAT    
-        cp -p $APP_WAR $APP_WAR_TOMCAT
+        cp $APP_WAR $APP_WAR_TOMCAT
     else
         echo WAR file could not be found at $APP_WAR
 	exit 1
@@ -183,7 +183,7 @@ deploy()
     copyWAR
     tomcatStartup
     apacheStart || true
-    tomcatShowlog
+#    tomcatShowlog
     
     exit 0
 }
