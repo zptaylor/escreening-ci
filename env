@@ -1,39 +1,68 @@
 #!/usr/bin/env bash
+
+#This holds the details for the scripts here
+SUDO_CMD=sudo
+export SUDO_CMD
+
+HTTPD_DIR=/app/escreening/httpd/latest
+export HTTPD_DIR
+
+APACHE_CTL=/app/escreening/httpd/latest/bin/apachectl
+export APACHE_CTL
+
+WEB_PORT_TO_FORWARD_TO_80=8000
+export WEB_PORT_TO_FORWARD_TO_80
+#8000 is Apache HTTP port; 8080 is Tomcat HTTP port
+
+WEB_PORT_TO_FORWARD_TO_443=7443
+export WEB_PORT_TO_FORWARD_TO_443
+#7443 is Apache HTTPS port, 8443 is Tomcat HTTPS port
+
+WEB_PORT_TO_FORWARD_TO_444=8444
+export WEB_PORT_TO_FORTWARD_TO_444
+
+TOMCAT_DIR=/app/escreening/tomcat/latest
+export TOMCAT_DIR
+
+TOMCAT_USER=www-data
+export TOMCAT_USER
+
+SCRIPTS_DIR=/app/escreening/scripts
+export SCRIPTS_DIR
+
+#APP_WAR=/home/ec2-user/escreening.war
+APP_WAR=/app/escreening/git-repo/eScreening/escreening/target/escreening.war
+export APP_WAR
+
+APP_WAR_TOMCAT=/app/escreening/war/escreening.war
+export APP_WAR_TOMCAT
+#was $TOMCAT_DIR/webapps/
+
+APP_PROPERTIES_ORIGINAL=/app/escreening/properties/escreening-war/escreening.properties.org
+export APP_PROPERTIES_ORIGINAL
+
+APP_PROPERTIES=/app/escreening/properties/escreening-war/escreening.properties
+export APP_PROPERTIES
+
+JAVA_HOME=/app/escreening/java/latest
+export JAVA_HOME
+
+SSH_PUSH_DEST=10.247.133.7
+export SSH_PUSH_DEST
+
+SERVER_TYPE="DEV" #PREPROD, DEV, SQA
+export SERVER_TYPE
+
+THISCMD="$0"
+THISARGS="$@"
+THISDIR="${PWD##*/}"
+
 . $(dirname $(readlink -f $0))/functions.sh
 
 FAIL_ON_ERROR
 
-#This holds the details for the scripts here
-SUDO_CMD=sudo
-HTTPD_DIR=/app/escreening/httpd/latest
-APACHE_CTL=/app/escreening/httpd/latest/bin/apachectl
-WEB_PORT_TO_FORWARD_TO_80=8000
-#8000 is Apache HTTP port; 8080 is Tomcat HTTP port
-WEB_PORT_TO_FORWARD_TO_443=7443
-#7443 is Apache HTTPS port, 8443 is Tomcat HTTPS port
-WEB_PORT_TO_FORWARD_TO_444=8444
-TOMCAT_DIR=/app/escreening/tomcat/latest
-TOMCAT_USER=www-data
-SCRIPTS_DIR=/app/escreening/scripts
-#APP_WAR=/home/ec2-user/escreening.war
-APP_WAR=/app/escreening/git-repo/eScreening/escreening/target/escreening.war
-APP_WAR_TOMCAT=/app/escreening/war/escreening.war
-#was $TOMCAT_DIR/webapps/
-APP_PROPERTIES_ORIGINAL=/app/escreening/properties/escreening-war/escreening.properties.org
-APP_PROPERTIES=/app/escreening/properties/escreening-war/escreening.properties
-JAVA_LOCATION=/app/escreening/java/latest
-SSH_PUSH_DEST=10.247.133.7
-SERVER_TYPE="DEV" #PREPROD, DEV, SQA
-THISCMD="$0"
-THISARGS="$@"
-THISDIR="${PWD##*/}"
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 
-#SCRIPTPATH="$SCRIPTS_DIR"
-#if [ "$SCRIPTPATH" != "/tmp" ] && [ "$SCRIPTPATH" != "$SCRIPTS_DIR" ]; then
-    #SCRIPTPATH = "$SCRIPTS_DIR"
-#fi
-setJavaHome
 #echo THISCMD="$THISCMD"
 #echo THISARGS="$THISARGS"
 #echo THISDIR="$THISDIR"

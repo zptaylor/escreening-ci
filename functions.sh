@@ -14,9 +14,9 @@ FAIL_ON_ERROR()
 }
 setJavaHome()
 {
-    if [ -d "$JAVA_LOCATION" ]; then
-        echo Setting JAVA_HOME to "$JAVA_LOCATION"
-        export JAVA_HOME="$JAVA_LOCATION"
+    if [ -d "$JAVA_HOME" ]; then
+        echo Setting JAVA_HOME to "$JAVA_HOME"
+        export JAVA_HOME="$JAVA_HOME"
     else
         echo Setting JAVA_HOME to "/usr"
         export JAVA_HOME=/usr
