@@ -10,16 +10,26 @@ export HTTPD_DIR
 APACHE_CTL=/app/escreening/httpd/latest/bin/apachectl
 export APACHE_CTL
 
-WEB_PORT_TO_FORWARD_TO_80=8000
-export WEB_PORT_TO_FORWARD_TO_80
-#8000 is Apache HTTP port; 8080 is Tomcat HTTP port
+#verify Apache http port (apache/conf/httpd.conf)
+APACHE_HTTP_PORT=7000
+#verify Tomcat http port (tomcat/conf/server.xml)
+TOMCAT_HTTP_PORT=8080
+#verify Apache https port (apache/conf/extras/httpd-ssl.conf)
+APACHE_HTTPS_PORT=7443
+#verify Tomcat https port (tomcat/conf/server.xml)
+TOMCAT_HTTPS_PORT=8443
 
-WEB_PORT_TO_FORWARD_TO_443=7443
+###SWITCH THESE IF TROUBLESHOOTING TOMCAT OR APACHE ISSUES
+#WEB_PORT_TO_FORWARD_TO_80=$TOMCAT_HTTP_PORT
+WEB_PORT_TO_FORWARD_TO_80=$APACHE_HTTP_PORT
+export WEB_PORT_TO_FORWARD_TO_80
+
+#WEB_PORT_TO_FORWARD_TO_443=$TOMCAT_HTTPS_PORT
+WEB_PORT_TO_FORWARD_TO_443=$APACHE_HTTPS_PORT
 export WEB_PORT_TO_FORWARD_TO_443
-#7443 is Apache HTTPS port, 8443 is Tomcat HTTPS port
 
 WEB_PORT_TO_FORWARD_TO_444=8444
-export WEB_PORT_TO_FORTWARD_TO_444
+export WEB_PORT_TO_FORWARD_TO_444
 
 TOMCAT_DIR=/app/escreening/tomcat/latest
 export TOMCAT_DIR

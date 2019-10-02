@@ -64,8 +64,11 @@ setPermissions()
 }
 sudoRun()
 {
-    echo sudoRunning $SUDO_CMD $@
-    $SUDO_CMD $@
+    if [ "$USER" != "root" ]; then
+        echo sudoRunning $SUDO_CMD $@
+        $SUDO_CMD $@;
+    else $@;
+    fi
 }
 apacheRestart()
 {
@@ -173,6 +176,8 @@ deploy()
     if [ "$USER" != "$TOMCAT_USER" ]
     then
         setPermissions
+#	sudoRun wipeIptables
+#	sudoRun initIptables
         rerunAs "$TOMCAT_USER"
         echo exiting
         exit 0;
@@ -236,7 +241,7 @@ apacheShowlog()
     #else
     #    echo 'unset'
     fi
-
+    cd /
     find "$HTTPD_DIR"/logs/ -type f \( -name "*log" \) -exec tail "$TAIL_OPTS" {} +
 }
 pushToOtherServer()
