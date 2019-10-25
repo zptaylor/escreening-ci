@@ -15,8 +15,9 @@ WEB_PORT_TO_FORWARD_TO_444=8444
 TOMCAT_DIR=/app/escreening/tomcat/latest
 TOMCAT_USER=www-data
 SCRIPTS_DIR=/app/escreening/scripts
-#APP_WAR=/app/escreening/escreen-3.0-test/escreening/target/escreening.war
+BLD_WAR=/var/lib/jenkins/workspace/Dev_escreen_ci/escreening/target/escreening-1.0.0-BUILD-SNAPSHOT.war
 APP_WAR=/var/lib/jenkins/workspace/Dev_escreen_ci/escreening/target/escreening.war
+#APP_WAR=/app/escreening/escreen-3.0-test/escreening/target/escreening.war
 #APP_WAR=/home/ec2-user/escreening.war
 APP_WAR_TOMCAT=/app/escreening/war/escreening.war
 #was $TOMCAT_DIR/webapps/

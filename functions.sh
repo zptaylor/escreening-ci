@@ -57,7 +57,7 @@ setPermissions()
     echo Setting permissions on $APP_WAR  to "$TOMCAT_USER":"$TOMCAT_USER"
     sudoRun chown "$TOMCAT_USER":"$TOMCAT_USER" $APP_WAR || true
     echo Setting permissions on $APP_WAR  to 7777
-    sudoRun chmod 7777 $APP_WAR || true
+    #sudoRun chmod 7777 $APP_WAR || true
     echo Setting permissions on Properties Files
     sudoRun chown "$TOMCAT_USER":"$TOMCAT_USER" $APP_PROPERTIES_ORIGINAL || true
     sudoRun chown "$TOMCAT_USER":"$TOMCAT_USER" $APP_PROPERTIES || true
@@ -163,6 +163,9 @@ copyWAR()
     if [ -f "$APP_WAR" ]; then
         echo Copying WAR file $APP_WAR to $APP_WAR_TOMCAT    
         cp $APP_WAR $APP_WAR_TOMCAT
+#    if [ -f "$BLD_WAR" ]; then
+#        echo Copying WAR file $BLD_WAR to $APP_WAR_TOMCAT    
+#        cp $BLD_WAR $APP_WAR_TOMCAT
     else
         echo WAR file could not be found at $APP_WAR
 	exit 1
@@ -187,6 +190,26 @@ deploy()
     
     exit 0
 }
+
+deployToDevServers()
+{
+    if [ "$USER" != "$TOMCAT_USER" ]
+    then
+        setPermissions
+        rerunAs "$TOMCAT_USER"
+        echo exiting
+        exit 0;
+    fi
+    echo Running as "$USER"
+    DESTINATION_IP=10.247.133.9
+    echo Copying to DEV box "$DESTINATION_IP" and running deploy on remote
+    echo Fix the permissions here TODO from root!
+
+    scp /var/lib/jenkins/workspace/Dev_escreen_ci/escreening/target/escreening.war root@$DESTINATION_IP:/home/ec2-user/escreening.war && \
+    ssh root@$DESTINATION_IP "/app/escreening/scripts/deploy.sh"
+    exit 0
+}
+
 tomcatShowlog()
 {
     if [ "$USER" != "$TOMCAT_USER" ]
