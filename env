@@ -20,8 +20,8 @@ APACHE_HTTPS_PORT=7443
 TOMCAT_HTTPS_PORT=8443
 
 ###SWITCH THESE IF TROUBLESHOOTING TOMCAT OR APACHE ISSUES
-#WEB_PORT_TO_FORWARD_TO_80=$TOMCAT_HTTP_PORT
-WEB_PORT_TO_FORWARD_TO_80=$APACHE_HTTP_PORT
+WEB_PORT_TO_FORWARD_TO_80=$TOMCAT_HTTP_PORT
+#WEB_PORT_TO_FORWARD_TO_80=$APACHE_HTTP_PORT
 export WEB_PORT_TO_FORWARD_TO_80
 
 #WEB_PORT_TO_FORWARD_TO_443=$TOMCAT_HTTPS_PORT
@@ -34,14 +34,14 @@ export WEB_PORT_TO_FORWARD_TO_444
 TOMCAT_DIR=/app/escreening/tomcat/latest
 export TOMCAT_DIR
 
-TOMCAT_USER=www-data
+TOMCAT_USER=ec2-user
 export TOMCAT_USER
 
 SCRIPTS_DIR=/app/escreening/scripts
 export SCRIPTS_DIR
 
-#APP_WAR=/home/ec2-user/escreening.war
-APP_WAR=/app/escreening/git-repo/eScreening/escreening/target/escreening.war
+APP_WAR=/home/ec2-user/escreening.war
+#APP_WAR=/app/escreening/git-repo/eScreening/escreening/target/escreening.war
 export APP_WAR
 
 APP_WAR_TOMCAT=/app/escreening/war/escreening.war

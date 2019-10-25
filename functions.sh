@@ -64,11 +64,13 @@ setPermissions()
 }
 sudoRun()
 {
-    if [ "$USER" != "root" ]; then
+#    if [ "$USER" != "root" ]; then
         echo sudoRunning $SUDO_CMD $@
         $SUDO_CMD $@;
-    else $@;
-    fi
+#    else 
+#      echo "$@"
+#      $@;
+#    fi
 }
 apacheRestart()
 {
@@ -188,7 +190,7 @@ deploy()
     copyWAR
     tomcatStartup
     apacheStart || true
-    tomcatShowlog
+#    tomcatShowlog
     
     exit 0
 }
