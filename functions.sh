@@ -161,7 +161,8 @@ copyProperties()
 copyWAR()
 {
     if [ -f "$APP_WAR" ]; then
-        echo Copying WAR file $APP_WAR to $APP_WAR_TOMCAT    
+        echo Copying WAR file $APP_WAR to $APP_WAR_TOMCAT
+        echo "$(ls -lah /var/lib/jenkins/workspace/Dev_escreen_ci/escreening/target/escreening.war)" || true
         cp $APP_WAR $APP_WAR_TOMCAT
 #    if [ -f "$BLD_WAR" ]; then
 #        echo Copying WAR file $BLD_WAR to $APP_WAR_TOMCAT    
@@ -181,7 +182,7 @@ deploy()
         exit 0;
     fi
     echo Running as "$USER"
-    tomcatShutdown || $TOMCAT_DIR/bin/shutdown.sh || true
+    tomcatShutdown || true
     copyProperties
     copyWAR
     tomcatStartup
@@ -190,6 +191,40 @@ deploy()
     
     exit 0
 }
+
+deployAndDebug()
+{
+    if [ "$USER" != "$TOMCAT_USER" ]
+    then
+        setPermissions
+        rerunAs "$TOMCAT_USER"
+        echo exiting
+        exit 0;
+    fi
+    echo Running as "$USER"
+    tomcatShutdown || $TOMCAT_DIR/bin/shutdown.sh || true
+    
+    TAIL_OPTS=-5f
+    local arg1=$THISARGS
+    if [ -n "${arg1-}" ]
+    then
+        TAIL_OPTS=$arg1
+    elif [ "${arg1+defined}" = defined ]
+    then
+        echo 'empty but defined'
+    else
+        echo 'unset'
+    fi
+
+    copyProperties
+    copyWAR
+    tomcatDebug
+    apacheStart || true
+#    tomcatShowlog
+
+    exit 0
+}
+
 
 deployToDevServers()
 {
