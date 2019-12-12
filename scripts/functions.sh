@@ -35,7 +35,7 @@ checkUserVariable()
 
 rerunAs()
 {
-    echo rerunAs "$@"
+    echo rerunAs "$@" from "$USER"
     sudoRun -u "$@" "$THISCMD" "$THISARGS"
 }
 
@@ -57,7 +57,7 @@ setPermissions()
     echo Setting permissions on $APP_WAR  to "$TOMCAT_USER":"$TOMCAT_USER"
     sudoRun chown "$TOMCAT_USER":"$TOMCAT_USER" $APP_WAR || true
     echo Setting permissions on $APP_WAR  to 7777
-    sudoRun chmod 7777 $APP_WAR || true
+    #sudoRun chmod 7777 $APP_WAR || true
     echo Setting permissions on Properties Files
     sudoRun chown "$TOMCAT_USER":"$TOMCAT_USER" $APP_PROPERTIES_ORIGINAL || true
     sudoRun chown "$TOMCAT_USER":"$TOMCAT_USER" $APP_PROPERTIES || true
@@ -102,7 +102,7 @@ apacheShutdown()
         exit 0;
     fi
     
-    echo "Stop Apache HTTPD with $APACHE_CTL start"
+    echo "Stop Apache HTTPD with $APACHE_CTL stop"
     $APACHE_CTL stop
     pkill -u $TOMCAT_USER httpd || true
 }
@@ -161,8 +161,12 @@ copyProperties()
 copyWAR()
 {
     if [ -f "$APP_WAR" ]; then
-        echo Copying WAR file $APP_WAR to $APP_WAR_TOMCAT    
-        cp -p $APP_WAR $APP_WAR_TOMCAT
+        echo Copying WAR file $APP_WAR to $APP_WAR_TOMCAT
+        echo "$(ls -lah /var/lib/jenkins/workspace/Dev_escreen_ci/escreening/target/escreening.war)" || true
+        cp $APP_WAR $APP_WAR_TOMCAT
+#    if [ -f "$BLD_WAR" ]; then
+#        echo Copying WAR file $BLD_WAR to $APP_WAR_TOMCAT    
+#        cp $BLD_WAR $APP_WAR_TOMCAT
     else
         echo WAR file could not be found at $APP_WAR
 	exit 1
@@ -178,15 +182,69 @@ deploy()
         exit 0;
     fi
     echo Running as "$USER"
-    tomcatShutdown || $TOMCAT_DIR/bin/shutdown.sh || true
+    tomcatShutdown || true
     copyProperties
     copyWAR
     tomcatStartup
     apacheStart || true
-    tomcatShowlog
+#    tomcatShowlog
     
     exit 0
 }
+
+deployAndDebug()
+{
+    if [ "$USER" != "$TOMCAT_USER" ]
+    then
+        setPermissions
+        rerunAs "$TOMCAT_USER"
+        echo exiting
+        exit 0;
+    fi
+    echo Running as "$USER"
+    tomcatShutdown || $TOMCAT_DIR/bin/shutdown.sh || true
+    
+    TAIL_OPTS=-5f
+    local arg1=$THISARGS
+    if [ -n "${arg1-}" ]
+    then
+        TAIL_OPTS=$arg1
+    elif [ "${arg1+defined}" = defined ]
+    then
+        echo 'empty but defined'
+    else
+        echo 'unset'
+    fi
+
+    copyProperties
+    copyWAR
+    tomcatDebug
+    apacheStart || true
+#    tomcatShowlog
+
+    exit 0
+}
+
+
+deployToDevServers()
+{
+    if [ "$USER" != "$TOMCAT_USER" ]
+    then
+        setPermissions
+        rerunAs "$TOMCAT_USER"
+        echo exiting
+        exit 0;
+    fi
+    echo Running as "$USER"
+    DESTINATION_IP=10.247.133.9
+    echo Copying to DEV box "$DESTINATION_IP" and running deploy on remote
+    echo Fix the permissions here TODO from root!
+
+    scp /var/lib/jenkins/workspace/Dev_escreen_ci/escreening/target/escreening.war root@$DESTINATION_IP:/home/ec2-user/escreening.war && \
+    ssh root@$DESTINATION_IP "/app/escreening/scripts/deploy.sh"
+    exit 0
+}
+
 tomcatShowlog()
 {
     if [ "$USER" != "$TOMCAT_USER" ]
