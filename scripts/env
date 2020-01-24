@@ -19,12 +19,6 @@ WEB_PORT_TO_FORWARD_TO_444=8444
 TOMCAT_DIR=/app/escreening/tomcat/latest
 TOMCAT_USER=www-data
 
-#WAR Locations
-BLD_WAR=/var/lib/jenkins/workspace/Dev_escreen_ci/escreening/target/escreening-1.0.0-BUILD-SNAPSHOT.war
-APP_WAR=/var/lib/jenkins/workspace/Dev_escreen_ci/escreening/target/escreening.war
-BLD_OTHER_WAR="/var/lib/jenkins/workspace/DEV Escreening Others/escreening/target/escreening.war"
-
-#This is the destination
 APP_WAR_TOMCAT=/app/escreening/war/escreening.war
 #(was $TOMCAT_DIR/webapps/, but the escreening.xml in conf/Catalina/localhosts should specify this directory)
 
