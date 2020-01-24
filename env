@@ -54,7 +54,8 @@ export APP_PROPERTIES_ORIGINAL
 APP_PROPERTIES=/app/escreening/properties/escreening-war/escreening.properties
 export APP_PROPERTIES
 
-JAVA_HOME=/app/escreening/java/latest
+#JAVA_HOME=/app/escreening/java/latest
+JAVA_HOME=/usr/java/latest
 export JAVA_HOME
 
 SSH_PUSH_DEST=10.247.133.7
