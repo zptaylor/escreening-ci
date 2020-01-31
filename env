@@ -3,40 +3,89 @@
 
 SCRIPTS_DIR=/app/escreening/scripts
 SUDO_CMD=sudo
+export SUDO_CMD
 
 #Apache details
 HTTPD_DIR=/app/escreening/httpd/latest
+export HTTPD_DIR
+
 APACHE_CTL=/app/escreening/httpd/latest/bin/apachectl
+export APACHE_CTL
 
-#Web Forwards
-WEB_PORT_TO_FORWARD_TO_80=8000
-#8000 is Apache HTTP port; 8080 is Tomcat HTTP port
-WEB_PORT_TO_FORWARD_TO_443=7443
-#7443 is Apache HTTPS port, 8443 is Tomcat HTTPS port
+#verify Apache http port (apache/conf/httpd.conf)
+APACHE_HTTP_PORT=7000
+#verify Tomcat http port (tomcat/conf/server.xml)
+TOMCAT_HTTP_PORT=8080
+#verify Apache https port (apache/conf/extras/httpd-ssl.conf)
+APACHE_HTTPS_PORT=7443
+#verify Tomcat https port (tomcat/conf/server.xml)
+TOMCAT_HTTPS_PORT=8443
+
+###SWITCH THESE IF TROUBLESHOOTING TOMCAT OR APACHE ISSUES
+WEB_PORT_TO_FORWARD_TO_80=$TOMCAT_HTTP_PORT
+#WEB_PORT_TO_FORWARD_TO_80=$APACHE_HTTP_PORT
+export WEB_PORT_TO_FORWARD_TO_80
+
+#WEB_PORT_TO_FORWARD_TO_443=$TOMCAT_HTTPS_PORT
+WEB_PORT_TO_FORWARD_TO_443=$APACHE_HTTPS_PORT
+export WEB_PORT_TO_FORWARD_TO_443
+
 WEB_PORT_TO_FORWARD_TO_444=8444
+export WEB_PORT_TO_FORWARD_TO_444
 
-#Tomcat details
 TOMCAT_DIR=/app/escreening/tomcat/latest
-TOMCAT_USER=www-data
+export TOMCAT_DIR
 
-APP_WAR_TOMCAT=/app/escreening/war/escreening.war
-#(was $TOMCAT_DIR/webapps/, but the escreening.xml in conf/Catalina/localhosts should specify this directory)
+TOMCAT_USER=ec2-user
+export TOMCAT_USER
 
-#Properties
-APP_PROPERTIES_ORIGINAL=/app/escreening/properties/escreening-war/escreening.properties.org
-APP_PROPERTIES=/app/escreening/properties/escreening-war/escreening.properties
+SCRIPTS_DIR=/app/escreening/scripts
+export SCRIPTS_DIR
 
 APP_WAR=/home/ec2-user/escreening.war
+#APP_WAR=/app/escreening/git-repo/eScreening/escreening/target/escreening.war
 export APP_WAR
 
-#Misc
-JAVA_LOCATION=/app/escreening/java/latest
-SSH_PUSH_DEST=10.247.133.12
+APP_WAR_TOMCAT=/app/escreening/war/escreening.war
+export APP_WAR_TOMCAT
+#was $TOMCAT_DIR/webapps/
+
+APP_PROPERTIES_ORIGINAL=/app/escreening/properties/escreening-war/escreening.properties.org
+export APP_PROPERTIES_ORIGINAL
+
+APP_PROPERTIES=/app/escreening/properties/escreening-war/escreening.properties
+export APP_PROPERTIES
+
+#JAVA_HOME=/app/escreening/java/latest
+JAVA_HOME=/usr/java/latest
+export JAVA_HOME
+
+SSH_PUSH_DEST=10.247.133.7
+export SSH_PUSH_DEST
+
 SERVER_TYPE="DEV" #PREPROD, DEV, SQA
+export SERVER_TYPE
+
 THISCMD="$0"
 THISARGS="$@"
 THISDIR="${PWD##*/}"
+
+. $(dirname $(readlink -f $0))/functions
+
+FAIL_ON_ERROR
+
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+
+ if [ -n "${USER-}" ]
+    then
+        echo Current user is $USER
+  elif [ "${arg1+defined}" = defined ]
+    then
+        echo 'empty but defined'
+    else
+        echo No USER found, so must be systemd..
+	USER="root"
+ fi
 
 #SCRIPTPATH="$SCRIPTS_DIR"
 #if [ "$SCRIPTPATH" != "/tmp" ] && [ "$SCRIPTPATH" != "$SCRIPTS_DIR" ]; then

@@ -14,9 +14,13 @@ FAIL_ON_ERROR()
 }
 setJavaHome()
 {
-    if [ -d "$JAVA_LOCATION" ]; then
-        echo Setting JAVA_HOME to "$JAVA_LOCATION"
-        export JAVA_HOME="$JAVA_LOCATION"
+    if [ -d "$JAVA_HOME" ]; then
+        echo Setting JAVA_HOME to "$JAVA_HOME"
+        export JAVA_HOME="$JAVA_HOME"
+    #if [ -d "$JAVA_LOCATION" ]; then
+    #    echo Setting JAVA_HOME to "$JAVA_LOCATION"
+    #    export JAVA_HOME="$JAVA_LOCATION"
+
     else
         echo Setting JAVA_HOME to "/usr"
         export JAVA_HOME=/usr
@@ -64,14 +68,21 @@ setPermissions()
 }
 sudoRun()
 {
-    echo sudoRunning $SUDO_CMD $@
-    $SUDO_CMD $@
+
+        echo sudoRunning $SUDO_CMD $@
+        $SUDO_CMD $@;
+#    else 
+#      echo "$@"
+#      $@;
+#    fi
 }
 apacheRestart()
 {
-    if [ "$USER" != "$TOMCAT_USER" ]
+#    if [ "$USER" != "$TOMCAT_USER" ]
+    if [ "$USER" != "root" ]
     then
-        rerunAs "$TOMCAT_USER"
+#        rerunAs "$TOMCAT_USER"
+        rerunAs "root"
         echo exiting
         exit 0;
     fi
@@ -82,9 +93,11 @@ apacheRestart()
 }
 apacheStart()
 {
-    if [ "$USER" != "$TOMCAT_USER" ]
+#    if [ "$USER" != "$TOMCAT_USER" ]
+    if [ "$USER" != "root" ]
     then
-        rerunAs "$TOMCAT_USER"
+#        rerunAs "$TOMCAT_USER"
+        rerunAs "root"
         echo exiting
         exit 0;
     fi
@@ -95,22 +108,25 @@ apacheStart()
 
 apacheShutdown()
 {
-    if [ "$USER" != "$TOMCAT_USER" ]
+#    if [ "$USER" != "$TOMCAT_USER" ]
+    if [ "$USER" != "root" ]
     then
-        rerunAs "$TOMCAT_USER"
+#        rerunAs "$TOMCAT_USER"
+        rerunAs "root"
         echo exiting
         exit 0;
     fi
     
     echo "Stop Apache HTTPD with $APACHE_CTL stop"
     $APACHE_CTL stop
+    sleep 5
     pkill -u $TOMCAT_USER httpd || true
 }
 tomcatDebug()
 {
     if [ "$USER" != "$TOMCAT_USER" ]
     then
-		setPermissions
+		    setPermissions
         rerunAs "$TOMCAT_USER"
         echo exiting
         exit 0;
@@ -163,10 +179,7 @@ copyWAR()
     if [ -f "$APP_WAR" ]; then
         echo Copying WAR file $APP_WAR to $APP_WAR_TOMCAT
         echo "$(ls -lah /var/lib/jenkins/workspace/Dev_escreen_ci/escreening/target/escreening.war)" || true
-        cp $APP_WAR $APP_WAR_TOMCAT
-#    if [ -f "$BLD_WAR" ]; then
-#        echo Copying WAR file $BLD_WAR to $APP_WAR_TOMCAT    
-#        cp $BLD_WAR $APP_WAR_TOMCAT
+        cp -p $APP_WAR $APP_WAR_TOMCAT
     else
         echo WAR file could not be found at $APP_WAR
 	exit 1
@@ -182,7 +195,7 @@ deploy()
         exit 0;
     fi
     echo Running as "$USER"
-    tomcatShutdown || true
+    tomcatShutdown || $TOMCAT_DIR/bin/shutdown.sh || true
     copyProperties
     copyWAR
     tomcatStartup
@@ -191,7 +204,6 @@ deploy()
     
     exit 0
 }
-
 deployAndDebug()
 {
     if [ "$USER" != "$TOMCAT_USER" ]
@@ -224,7 +236,6 @@ deployAndDebug()
 
     exit 0
 }
-
 
 deployToDevServers()
 {
@@ -271,9 +282,10 @@ tomcatShowlog()
     
     tail $TAIL_OPTS $TOMCAT_DIR/logs/catalina.out
 }
+
 apacheShowlog()
 {
-    if [ "$USER" != "$TOMCAT_USER" ]
+    if [ "$USER" != "$TOMCAT_USER" ] && [ "$USER" != "root" ]
     then
         rerunAs "$TOMCAT_USER"
         echo exiting
@@ -294,7 +306,7 @@ apacheShowlog()
     #else
     #    echo 'unset'
     fi
-
+    cd /
     find "$HTTPD_DIR"/logs/ -type f \( -name "*log" \) -exec tail "$TAIL_OPTS" {} +
 }
 pushToOtherServer()
