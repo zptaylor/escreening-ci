@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+# chkconfig: 345 55 25
+# description: init CI 01.29.2020
+
+# REQUIRES: /app/*/scripts/ directory to contain: env, functions.sh
+# Needs work
+# INSTALL INSTRUCTIONS
+# Make sure path/this file are replacing *
+# ln -s /app/*/scripts/initCi.sh /etc/init.d/*
+# systemctl daemon-reload
+# chkconfig * on OR systemctl enable *
+
+##References
+### https://www.thegeekdiary.com/how-to-enable-or-disable-service-on-boot-with-chkconfig/
+### https://access.redhat.com/discussions/1455613
+### https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/5/html/Installation_Guide/s1-boot-init-shutdown-run-boot.html
+### https://arstechnica.com/civis/viewtopic.php?p=2147913
+### https://www.linuxjournal.com/article/4445
+
+echo Source function library.
+. /etc/init.d/functions
+
+echo Source custom env variables for app
+. $(dirname $(readlink -f $0))/env
+
+echo Source custom functions for app
+. $(dirname $(readlink -f $0))/functions
+
+start() {
+    echo "Starting Application"
+    echo "Disabling SELinux!"
+      setenforce 0
+    echo "Starting Apache"
+      /app/escreening/httpd/latest/bin/apachectl start
+
+    echo "Setting NAT forwards"
+#        wipeIptables #this breaks docker if it is running TODO fix
+#        initIptables #make sure this actually sets the right rules
+
+#    daemon --user=tomcat $SCRIPTPATH/startupTomcat
+    echo "Starting Docker Compose"
+        /app/escreening/scripts/start-compose
+}
+
+stop() {
+ #   daemon --user=tomcat $SCRIPTPATH/shutdownTomcat.sh
+    echo "Stopping Apache"
+        /app/escreening/httpd/latest/bin/apachectl stop
+}
+
+status() {
+    echo "Status unimplemented"
+}
+if [ -n "${1-}" ]
+then
+  case "$1" in
+    start)
+       start
+       ;;
+    stop)
+       stop
+       ;;
+    restart)
+       stop
+       start
+       ;;
+    status)
+       # code to check status of app comes here
+       # example: status program_name
+       status
+       ;;
+    *)
+       echo "Usage: $0 {start|stop|status|restart}"
+  esac
+
+elif [ "${1+defined}" = defined ]
+then
+    #'empty but defined'
+        echo an argument must be passed
+else
+    echo 'argument must be passed'
+fi
+
+exit 0
+

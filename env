@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-
 #This holds the details for the scripts here
+
+SCRIPTS_DIR=/app/escreening/scripts
 SUDO_CMD=sudo
 export SUDO_CMD
 
+#Apache details
 HTTPD_DIR=/app/escreening/httpd/latest
 export HTTPD_DIR
 
@@ -85,9 +87,10 @@ SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 	USER="root"
  fi
 
-
-
-
+#SCRIPTPATH="$SCRIPTS_DIR"
+#if [ "$SCRIPTPATH" != "/tmp" ] && [ "$SCRIPTPATH" != "$SCRIPTS_DIR" ]; then
+    #SCRIPTPATH = "$SCRIPTS_DIR"
+#fi
 #echo THISCMD="$THISCMD"
 #echo THISARGS="$THISARGS"
 #echo THISDIR="$THISDIR"
@@ -95,3 +98,21 @@ SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 #echo SERVER_TYPE="$SERVER_TYPE"
 #echo JAVA_HOME="$JAVA_HOME"
 #echo "$@"
+
+. $(dirname $(readlink -f $0))/functions || . "$SCRIPTS_DIR"/functions
+
+ if [ -n "${USER-}" ]
+    then
+        echo Current user is $USER
+  elif [ "${arg1+defined}" = defined ]
+    then
+        echo 'empty but defined'
+    else
+        echo No USER found, so must be systemd..
+        USER="root"
+ fi
+
+
+FAIL_ON_ERROR
+
+setJavaHome

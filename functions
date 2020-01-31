@@ -17,6 +17,10 @@ setJavaHome()
     if [ -d "$JAVA_HOME" ]; then
         echo Setting JAVA_HOME to "$JAVA_HOME"
         export JAVA_HOME="$JAVA_HOME"
+    #if [ -d "$JAVA_LOCATION" ]; then
+    #    echo Setting JAVA_HOME to "$JAVA_LOCATION"
+    #    export JAVA_HOME="$JAVA_LOCATION"
+
     else
         echo Setting JAVA_HOME to "/usr"
         export JAVA_HOME=/usr
@@ -35,7 +39,7 @@ checkUserVariable()
 
 rerunAs()
 {
-    echo rerunAs "$@"
+    echo rerunAs "$@" from "$USER"
     sudoRun -u "$@" "$THISCMD" "$THISARGS"
 }
 
@@ -57,14 +61,14 @@ setPermissions()
     echo Setting permissions on $APP_WAR  to "$TOMCAT_USER":"$TOMCAT_USER"
     sudoRun chown "$TOMCAT_USER":"$TOMCAT_USER" $APP_WAR || true
     echo Setting permissions on $APP_WAR  to 7777
-    sudoRun chmod 7777 $APP_WAR || true
+    #sudoRun chmod 7777 $APP_WAR || true
     echo Setting permissions on Properties Files
     sudoRun chown "$TOMCAT_USER":"$TOMCAT_USER" $APP_PROPERTIES_ORIGINAL || true
     sudoRun chown "$TOMCAT_USER":"$TOMCAT_USER" $APP_PROPERTIES || true
 }
 sudoRun()
 {
-#    if [ "$USER" != "root" ]; then
+
         echo sudoRunning $SUDO_CMD $@
         $SUDO_CMD $@;
 #    else 
@@ -122,7 +126,7 @@ tomcatDebug()
 {
     if [ "$USER" != "$TOMCAT_USER" ]
     then
-	setPermissions
+		    setPermissions
         rerunAs "$TOMCAT_USER"
         echo exiting
         exit 0;
@@ -172,8 +176,9 @@ copyProperties()
 }
 copyWAR()
 {
-    if [ -r "$APP_WAR" ]; then
-        echo Copying WAR file $APP_WAR to $APP_WAR_TOMCAT    
+    if [ -f "$APP_WAR" ]; then
+        echo Copying WAR file $APP_WAR to $APP_WAR_TOMCAT
+        echo "$(ls -lah /var/lib/jenkins/workspace/Dev_escreen_ci/escreening/target/escreening.war)" || true
         cp -p $APP_WAR $APP_WAR_TOMCAT
     else
         echo WAR file could not be found at $APP_WAR
@@ -185,8 +190,6 @@ deploy()
     if [ "$USER" != "$TOMCAT_USER" ]
     then
         setPermissions
-#	sudoRun wipeIptables
-#	sudoRun initIptables
         rerunAs "$TOMCAT_USER"
         echo exiting
         exit 0;
@@ -201,6 +204,58 @@ deploy()
     
     exit 0
 }
+deployAndDebug()
+{
+    if [ "$USER" != "$TOMCAT_USER" ]
+    then
+        setPermissions
+        rerunAs "$TOMCAT_USER"
+        echo exiting
+        exit 0;
+    fi
+    echo Running as "$USER"
+    tomcatShutdown || $TOMCAT_DIR/bin/shutdown.sh || true
+    
+    TAIL_OPTS=-5f
+    local arg1=$THISARGS
+    if [ -n "${arg1-}" ]
+    then
+        TAIL_OPTS=$arg1
+    elif [ "${arg1+defined}" = defined ]
+    then
+        echo 'empty but defined'
+    else
+        echo 'unset'
+    fi
+
+    copyProperties
+    copyWAR
+    tomcatDebug
+    apacheStart || true
+#    tomcatShowlog
+
+    exit 0
+}
+
+deployToDevServers()
+{
+    if [ "$USER" != "$TOMCAT_USER" ]
+    then
+        setPermissions
+        rerunAs "$TOMCAT_USER"
+        echo exiting
+        exit 0;
+    fi
+    echo Running as "$USER"
+    DESTINATION_IP=10.247.133.9
+    echo Copying to DEV box "$DESTINATION_IP" and running deploy on remote
+    echo Fix the permissions here TODO from root!
+
+    scp /var/lib/jenkins/workspace/Dev_escreen_ci/escreening/target/escreening.war root@$DESTINATION_IP:/home/ec2-user/escreening.war && \
+    ssh root@$DESTINATION_IP "/app/escreening/scripts/deploy"
+    exit 0
+}
+
 tomcatShowlog()
 {
     if [ "$USER" != "$TOMCAT_USER" ]
@@ -227,6 +282,7 @@ tomcatShowlog()
     
     tail $TAIL_OPTS $TOMCAT_DIR/logs/catalina.out
 }
+
 apacheShowlog()
 {
     if [ "$USER" != "$TOMCAT_USER" ] && [ "$USER" != "root" ]
@@ -367,4 +423,21 @@ compressScripts()
 {
     tar -czvf /tmp/app.scripts.tar.gz $SCRIPTS_DIR
     chmod 777 /tmp/app.scripts.tar.gz
+}
+
+dockerComposeReinit()
+{
+    if [ "$USER" != "root" ]
+    then
+        rerunAs "root"
+        echo exiting
+        exit 0;
+    fi
+    cd /app/escreening
+    docker-compose stop
+    echo stopped
+    docker-compose rm -f
+    echo removed instances
+    docker-compose up -d --remove-orphans
+    echo started compose
 }
