@@ -68,11 +68,25 @@ THISCMD="$0"
 THISARGS="$@"
 THISDIR="${PWD##*/}"
 
-. $(dirname $(readlink -f $0))/functions.sh
+. $(dirname $(readlink -f $0))/functions
 
 FAIL_ON_ERROR
 
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+
+ if [ -n "${USER-}" ]
+    then
+        echo Current user is $USER
+  elif [ "${arg1+defined}" = defined ]
+    then
+        echo 'empty but defined'
+    else
+        echo No USER found, so must be systemd..
+	USER="root"
+ fi
+
+
+
 
 #echo THISCMD="$THISCMD"
 #echo THISARGS="$THISARGS"

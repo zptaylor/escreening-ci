@@ -2,15 +2,7 @@
 # chkconfig: 345 55 25
 # description: start eScreening
 
-# REQUIRES: /app/*/scripts/ directory to contain: env, functions.sh
-
-# INSTALL INSTRUCTIONS (Need to be updated)
-# dzdo rm /app/vic/scripts/initVIC.sh ; dzdo nano /app/vic/scripts/initVIC.sh ; dzdo chmod a+rwx /app/vic/scripts/initVIC.sh
-## paste this whole script in there and save
-## to create the init link for server startup:
-# dzdo ln -s /app/vic/scripts/initVIC.sh /etc/init.d/initVIC
-# dzdo systemctl daemon-reload
-# dzdo chkconfig initVIC on
+# REQUIRES: /app/*/scripts/ directory to contain: env, functions
 
 ##References
 ### https://www.thegeekdiary.com/how-to-enable-or-disable-service-on-boot-with-chkconfig/
@@ -26,24 +18,24 @@ echo Source custom env variables for app
 . $(dirname $(readlink -f $0))/env
 
 echo Source custom functions for app
-. $(dirname $(readlink -f $0))/functions.sh
+. $(dirname $(readlink -f $0))/functions
 
 start() {
     echo "Starting Application"
     echo "Disabling SELinux!"
       setenforce 0
-    echo "Setting NAT forwards"
-	wipeIptables
-	initIptables
+#    echo "Setting NAT forwards"
+#	wipeIptables
+#	initIptables
 
-    echo "Starting Tomcat"
-#    daemon --user=tomcat $SCRIPTPATH/startupTomcat.sh
+#    echo "Starting Tomcat"
+#    daemon --user=tomcat $SCRIPTPATH/startupTomcat
 }
 
 stop() {
     # code to stop app comes here
     # example: killproc program_name
- #   daemon --user=tomcat $SCRIPTPATH/shutdownTomcat.sh
+ #   daemon --user=tomcat $SCRIPTPATH/shutdownTomcat
     echo "Stopping not set up."
 }
 
@@ -64,6 +56,7 @@ then
        # code to check status of app comes here
        # example: status program_name
        #daemon --user=tomcat $SCRIPTPATH/showlog.sh
+       echo "No status implemented"
        ;;
     *)
        echo "Usage: $0 {start|stop|status|restart}"

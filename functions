@@ -74,9 +74,11 @@ sudoRun()
 }
 apacheRestart()
 {
-    if [ "$USER" != "$TOMCAT_USER" ]
+#    if [ "$USER" != "$TOMCAT_USER" ]
+    if [ "$USER" != "root" ]
     then
-        rerunAs "$TOMCAT_USER"
+#        rerunAs "$TOMCAT_USER"
+        rerunAs "root"
         echo exiting
         exit 0;
     fi
@@ -87,9 +89,11 @@ apacheRestart()
 }
 apacheStart()
 {
-    if [ "$USER" != "$TOMCAT_USER" ]
+#    if [ "$USER" != "$TOMCAT_USER" ]
+    if [ "$USER" != "root" ]
     then
-        rerunAs "$TOMCAT_USER"
+#        rerunAs "$TOMCAT_USER"
+        rerunAs "root"
         echo exiting
         exit 0;
     fi
@@ -100,22 +104,25 @@ apacheStart()
 
 apacheShutdown()
 {
-    if [ "$USER" != "$TOMCAT_USER" ]
+#    if [ "$USER" != "$TOMCAT_USER" ]
+    if [ "$USER" != "root" ]
     then
-        rerunAs "$TOMCAT_USER"
+#        rerunAs "$TOMCAT_USER"
+        rerunAs "root"
         echo exiting
         exit 0;
     fi
     
-    echo "Stop Apache HTTPD with $APACHE_CTL start"
+    echo "Stop Apache HTTPD with $APACHE_CTL stop"
     $APACHE_CTL stop
+    sleep 5
     pkill -u $TOMCAT_USER httpd || true
 }
 tomcatDebug()
 {
     if [ "$USER" != "$TOMCAT_USER" ]
     then
-		setPermissions
+	setPermissions
         rerunAs "$TOMCAT_USER"
         echo exiting
         exit 0;
@@ -222,7 +229,7 @@ tomcatShowlog()
 }
 apacheShowlog()
 {
-    if [ "$USER" != "$TOMCAT_USER" ]
+    if [ "$USER" != "$TOMCAT_USER" ] && [ "$USER" != "root" ]
     then
         rerunAs "$TOMCAT_USER"
         echo exiting
@@ -258,7 +265,7 @@ pushToOtherServer()
 }
 runScriptOnOtherServer()
 {
-    ssh -t $TOMCAT_USER@$SSH_PUSH_DEST "bash /tmp/deploy.sh"
+    ssh -t $TOMCAT_USER@$SSH_PUSH_DEST "bash /tmp/deploy"
 }
 hotDeploy()
 {
@@ -351,7 +358,7 @@ initIptables()
 makeLinks()
 {
     echo "Making links to these scripts in the /tmp/ directory"
-    for filename in $SCRIPTS_DIR/*.sh; do
+    for filename in $SCRIPTS_DIR/*; do
         ln -s "$filename" /tmp/$(basename "$filename") -v || true
     done
 }
