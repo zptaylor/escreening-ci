@@ -26,6 +26,9 @@ APP_WAR_TOMCAT=/app/escreening/war/escreening.war
 APP_PROPERTIES_ORIGINAL=/app/escreening/properties/escreening-war/escreening.properties.org
 APP_PROPERTIES=/app/escreening/properties/escreening-war/escreening.properties
 
+APP_WAR=/home/ec2-user/escreening.war
+export APP_WAR
+
 #Misc
 JAVA_LOCATION=/app/escreening/java/latest
 SSH_PUSH_DEST=10.247.133.12
@@ -47,7 +50,19 @@ SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 #echo JAVA_HOME="$JAVA_HOME"
 #echo "$@"
 
-. $(dirname $(readlink -f $0))/functions.sh || . "$SCRIPTS_DIR"/functions.sh
+. $(dirname $(readlink -f $0))/functions || . "$SCRIPTS_DIR"/functions
+
+ if [ -n "${USER-}" ]
+    then
+        echo Current user is $USER
+  elif [ "${arg1+defined}" = defined ]
+    then
+        echo 'empty but defined'
+    else
+        echo No USER found, so must be systemd..
+        USER="root"
+ fi
+
 
 FAIL_ON_ERROR
 
