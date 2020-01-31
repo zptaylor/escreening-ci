@@ -241,7 +241,7 @@ deployToDevServers()
     echo Fix the permissions here TODO from root!
 
     scp /var/lib/jenkins/workspace/Dev_escreen_ci/escreening/target/escreening.war root@$DESTINATION_IP:/home/ec2-user/escreening.war && \
-    ssh root@$DESTINATION_IP "/app/escreening/scripts/deploy.sh"
+    ssh root@$DESTINATION_IP "/app/escreening/scripts/deploy"
     exit 0
 }
 
@@ -309,7 +309,7 @@ pushToOtherServer()
 }
 runScriptOnOtherServer()
 {
-    ssh -t $TOMCAT_USER@$SSH_PUSH_DEST "bash /tmp/deploy.sh"
+    ssh -t $TOMCAT_USER@$SSH_PUSH_DEST "bash /tmp/deploy"
 }
 hotDeploy()
 {
@@ -402,7 +402,7 @@ initIptables()
 makeLinks()
 {
     echo "Making links to these scripts in the /tmp/ directory"
-    for filename in $SCRIPTS_DIR/*.sh; do
+    for filename in $SCRIPTS_DIR/*; do
         ln -s "$filename" /tmp/$(basename "$filename") -v || true
     done
 }
@@ -411,4 +411,21 @@ compressScripts()
 {
     tar -czvf /tmp/app.scripts.tar.gz $SCRIPTS_DIR
     chmod 777 /tmp/app.scripts.tar.gz
+}
+
+dockerComposeReinit()
+{
+    if [ "$USER" != "root" ]
+    then
+        rerunAs "root"
+        echo exiting
+        exit 0;
+    fi
+    cd /app/escreening
+    docker-compose stop
+    echo stopped
+    docker-compose rm -f
+    echo removed instances
+    docker-compose up -d --remove-orphans
+    echo started compose
 }
